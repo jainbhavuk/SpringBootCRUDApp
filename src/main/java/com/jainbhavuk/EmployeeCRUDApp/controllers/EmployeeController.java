@@ -56,9 +56,8 @@ public class EmployeeController {
         if(emp.isPresent()){
             return new ResponseEntity<Employee>(emp.get(), HttpStatus.OK);
         }
-        else{
-            return new ResponseEntity<Employee>(HttpStatus.NOT_FOUND);
-        }
+
+        return new ResponseEntity<Employee>(HttpStatus.NOT_FOUND);
     }
 
     /**
@@ -87,9 +86,8 @@ public class EmployeeController {
 
             return "Successfully modified the records of employee with id " + empId;
         }
-        else {
-            return "No record found!";
-        }
+
+        return "No record found!";
     }
 
     /**
@@ -107,8 +105,24 @@ public class EmployeeController {
 
             return "Successfully Deleted Employee With Id " + empId;
         }
-        else{
-            return "No Record Found!";
-        }
+
+        return "No Record Found!";
     }
+
+    /**
+     * Delete all employee records.
+     *
+     * @return a success message if all records are deleted, or a message if no records are found
+     */
+    @DeleteMapping("/employee")
+    private String deleteAllEmployees(){
+        if(!employeeRepository.findAll().isEmpty()) {
+            employeeRepository.deleteAll();
+
+            return "All records deleted!";
+        }
+
+        return "No records to delete!";
+    }
+
 }
