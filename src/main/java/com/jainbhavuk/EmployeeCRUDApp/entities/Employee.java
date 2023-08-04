@@ -2,6 +2,8 @@ package com.jainbhavuk.EmployeeCRUDApp.entities;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "employee")
 public class Employee {
@@ -14,7 +16,7 @@ public class Employee {
     private String empName;
 
     @Column(name = "emp_salary")
-    private Float empSalary;
+    private BigDecimal empSalary;
 
     @Column(name = "emp_age")
     private int empAge;
@@ -38,11 +40,11 @@ public class Employee {
         this.empName = empName;
     }
 
-    public Float getEmpSalary() {
+    public BigDecimal getEmpSalary() {
         return empSalary;
     }
 
-    public void setEmpSalary(Float empSalary) {
+    public void setEmpSalary(BigDecimal empSalary) {
         this.empSalary = empSalary;
     }
 
@@ -62,7 +64,7 @@ public class Employee {
         this.empCity = empCity;
     }
 
-    public Employee(int empId, String empName, Float empSalary, int empAge, String empCity) {
+    public Employee(int empId, String empName, BigDecimal empSalary, int empAge, String empCity) {
         this.empId = empId;
         this.empName = empName;
         this.empSalary = empSalary;
