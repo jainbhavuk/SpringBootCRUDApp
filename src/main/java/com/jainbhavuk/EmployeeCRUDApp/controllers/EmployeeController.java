@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.awt.font.OpenType;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -37,6 +38,26 @@ public class EmployeeController {
         }
         else{
             return new ResponseEntity<Employee>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/employee/{empId}")
+    private String modifyEmployee(@PathVariable Integer empId, @RequestBody  Employee employee){
+      Optional< Employee> existingEmp = employeeRepository.findById(empId);
+
+        if(existingEmp.isPresent()){
+            Employee employeeToOverride = existingEmp.get();
+
+            employeeToOverride.setEmpCity(Objects.nonNull(employee.getEmpCity()) ? employee.getEmpCity() : employeeToOverride.getEmpCity());
+            employeeToOverride.setEmpName(Objects.nonNull(employee.getEmpName()) ? employee.getEmpName() : employeeToOverride.getEmpName());
+            employeeToOverride.setEmpSalary(Objects.nonNull(employee.getEmpSalary()) ? employee.getEmpSalary() : employeeToOverride.getEmpSalary());
+            employeeToOverride.setEmpAge(Objects.nonNull(employee.getEmpAge()) ? employee.getEmpAge() : employeeToOverride.getEmpAge());
+
+            employeeRepository.save(employeeToOverride);
+            return "Successfully modified the records of employee with id " + empId;
+        }
+        else {
+            return "No record found!";
         }
     }
 }

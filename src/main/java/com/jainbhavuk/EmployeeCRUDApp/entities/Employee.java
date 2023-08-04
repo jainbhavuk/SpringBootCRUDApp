@@ -19,7 +19,7 @@ public class Employee {
     private BigDecimal empSalary;
 
     @Column(name = "emp_age")
-    private int empAge;
+    private Integer empAge;
 
     @Column(name = "emp_city")
     private String empCity;
@@ -48,11 +48,11 @@ public class Employee {
         this.empSalary = empSalary;
     }
 
-    public int getEmpAge() {
+    public Integer getEmpAge() {
         return empAge;
     }
 
-    public void setEmpAge(int empAge) {
+    public void setEmpAge(Integer empAge) {
         this.empAge = empAge;
     }
 
@@ -64,7 +64,7 @@ public class Employee {
         this.empCity = empCity;
     }
 
-    public Employee(int empId, String empName, BigDecimal empSalary, int empAge, String empCity) {
+    public Employee(int empId, String empName, BigDecimal empSalary, Integer empAge, String empCity) {
         this.empId = empId;
         this.empName = empName;
         this.empSalary = empSalary;
