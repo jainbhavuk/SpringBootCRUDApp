@@ -1,128 +1,122 @@
 package com.jainbhavuk.EmployeeCRUDApp.controllers;
 
 import com.jainbhavuk.EmployeeCRUDApp.entities.Employee;
-import com.jainbhavuk.EmployeeCRUDApp.repositories.EmployeeRepository;
+import com.jainbhavuk.EmployeeCRUDApp.services.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.awt.font.OpenType;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
- * REST controller for managing employee records.
+ * This class represents the RESTful API endpoints for managing employees.
  */
 @RestController
 @RequestMapping("/api")
 public class EmployeeController {
 
     @Autowired
-    EmployeeRepository employeeRepository;
+    private EmployeeService employeeService;
 
     /**
-     * Create a new employee record.
+     * Create a new employee.
      *
-     * @param employee the employee object to be created
-     * @return the created employee object
+     * @param employee The employee object to be created.
+     * @return The created employee object.
      */
     @PostMapping("/employee")
-    private Employee createNewEmployee(@RequestBody Employee employee){
-        return employeeRepository.save(employee);
+    public Employee createNewEmployee(@RequestBody Employee employee) {
+        return employeeService.createEmployee(employee);
     }
 
     /**
-     * Get all employee records.
+     * Get all employees.
      *
-     * @return a response entity containing a list of all employees
+     * @return A ResponseEntity containing a list of all employees in the system.
+     *  If no employees are found, return HttpStatus.NOT_FOUND.
      */
     @GetMapping("/employee")
-    private ResponseEntity<List<Employee>> getAllEmployees(){
-        return new ResponseEntity<List<Employee>>(employeeRepository.findAll(), HttpStatus.OK);
+    public ResponseEntity<List<Employee>> getAllEmployees() {
+        List<Employee> employees = employeeService.getAllEmployees();
+
+        if (!employees.isEmpty()) {
+            return new ResponseEntity<>(employees, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     /**
-     * Get an employee record by ID.
+     * Get an employee by their ID.
      *
-     * @param empId the ID of the employee to retrieve
-     * @return a response entity containing the employee object if found, or a NOT_FOUND status if not found
+     * @param empId The ID of the employee to retrieve.
+     * @return A ResponseEntity containing the employee object if found, or HttpStatus.NOT_FOUND if not found.
      */
     @GetMapping("/employee/{empId}")
-    private ResponseEntity<Employee> getEmployeeById(@PathVariable Integer empId){
-        Optional<Employee> emp = employeeRepository.findById(empId);
+    public ResponseEntity<Employee> getEmployeeById(@PathVariable Integer empId) {
+        Optional<Employee> emp = employeeService.getEmployeeById(empId);
 
-        if(emp.isPresent()){
-            return new ResponseEntity<Employee>(emp.get(), HttpStatus.OK);
+        if (emp.isPresent()) {
+            return new ResponseEntity<>(emp.get(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-        return new ResponseEntity<Employee>(HttpStatus.NOT_FOUND);
     }
 
     /**
-     * Modify an employee record.
+     * Update an existing employee by their ID.
      *
-     * @param empId the ID of the employee to modify
-     * @param employee the modified employee object
-     * @return a success message if the employee is modified, or a message if no record is found
+     * @param empId    The ID of the employee to be updated.
+     * @param employee The updated employee object.
+     * @return A message indicating the success of the update operation.
      */
     @PutMapping("/employee/{empId}")
-    private String modifyEmployee(@PathVariable Integer empId, @RequestBody Employee employee){
-        Optional<Employee> existingEmp = employeeRepository.findById(empId);
-
-        if(existingEmp.isPresent()){
-            Employee employeeToOverride = existingEmp.get();
-
-            /**
-             * Check for null values before saving the new object in order to prevent overriding of already existing values.
-             */
-            employeeToOverride.setEmpCity(Objects.nonNull(employee.getEmpCity()) ? employee.getEmpCity() : employeeToOverride.getEmpCity());
-            employeeToOverride.setEmpName(Objects.nonNull(employee.getEmpName()) ? employee.getEmpName() : employeeToOverride.getEmpName());
-            employeeToOverride.setEmpSalary(Objects.nonNull(employee.getEmpSalary()) ? employee.getEmpSalary() : employeeToOverride.getEmpSalary());
-            employeeToOverride.setEmpAge(Objects.nonNull(employee.getEmpAge()) ? employee.getEmpAge() : employeeToOverride.getEmpAge());
-
-            employeeRepository.save(employeeToOverride);
-
-            return "Successfully modified the records of employee with id " + empId;
-        }
-
-        return "No record found!";
+    public String modifyEmployee(@PathVariable Integer empId, @RequestBody Employee employee) {
+        return employeeService.modifyEmployee(empId, employee);
     }
 
     /**
-     * Delete an employee record by ID.
+     * Delete an employee by their ID.
      *
-     * @param empId the ID of the employee to delete
-     * @return a success message if the employee is deleted, or a message if no record is found
+     * @param empId The ID of the employee to be deleted.
+     * @return A message indicating the success of the delete operation.
      */
     @DeleteMapping("/employee/{empId}")
-    private String deleteEmployeeById(@PathVariable Integer empId){
-        Optional<Employee> existingEmp = employeeRepository.findById(empId);
-
-        if(existingEmp.isPresent()) {
-            employeeRepository.deleteById(empId);
-
-            return "Successfully Deleted Employee With Id " + empId;
-        }
-
-        return "No Record Found!";
+    public String deleteEmployeeById(@PathVariable Integer empId) {
+        return employeeService.deleteEmployeeById(empId);
     }
 
     /**
-     * Delete all employee records.
+     * Delete all employees from the system.
      *
-     * @return a success message if all records are deleted, or a message if no records are found
+     * @return A message indicating the success of the delete operation.
      */
     @DeleteMapping("/employee")
-    private String deleteAllEmployees(){
-        if(!employeeRepository.findAll().isEmpty()) {
-            employeeRepository.deleteAll();
-
-            return "All records deleted!";
-        }
-
-        return "No records to delete!";
+    public String deleteAllEmployees() {
+        return employeeService.deleteAllEmployees();
     }
 
+    /**
+     * Get a list of employees by the specified city name.
+     *
+     * @param cityName The name of the city to search for employees.
+     * @return A list of employees from the specified city.
+     */
+    @GetMapping("/employee/city/{cityName}")
+    public List<Employee> getEmployeesByCityName(@PathVariable String cityName) {
+        return employeeService.getEmployeesByCity(cityName);
+    }
+
+    /**
+     * Get a list of employees with the specified age.
+     *
+     * @param age The age to filter employees.
+     * @return A list of employees with the specified age.
+     */
+    @GetMapping("/employee/age/{age}")
+    public List<Employee> getEmployeesByAge(@PathVariable Integer age) {
+        return employeeService.getEmployeesByAge(age);
+    }
 }
